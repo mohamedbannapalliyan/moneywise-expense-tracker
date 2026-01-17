@@ -18,6 +18,16 @@ export function TransactionHistory() {
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }, [transactions, filter]);
 
+    const handleExport = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(transactions, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `moneywise_backup_${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    };
+
     // Group by Date
     const grouped = filteredTransactions.reduce((acc, t) => {
         const date = t.date.split('T')[0];
@@ -52,6 +62,13 @@ export function TransactionHistory() {
                     </button>
                 ))}
             </div>
+
+            <button
+                onClick={handleExport}
+                className="absolute top-0 right-0 text-xs text-indigo-400 hover:text-indigo-300 font-medium px-3 py-1.5 rounded-lg border border-indigo-500/20 hover:bg-indigo-500/10 transition-colors"
+            >
+                Export Data
+            </button>
 
             <div className="space-y-8">
                 {Object.entries(grouped).map(([date, items]) => (
